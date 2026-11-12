@@ -116,7 +116,7 @@ function useAnimatedViewBox(target) {
   return vb
 }
 
-export default function Construction({ step, guide, onComplete }) {
+export default function Construction({ step, variant, onComplete }) {
   const [narrow] = useState(isNarrow)
   const FS_K = narrow ? 0.04 : 0.026
   const aspect = narrow ? 1.05 : 1.6
@@ -387,7 +387,7 @@ export default function Construction({ step, guide, onComplete }) {
       if (wantsSmall && best.t.layer === 'big') why = '$1$, $\\cos(A)$ og $\\sin(A)$ er længderne i den lille trekant fra enhedscirklen.'
       if (!wantsSmall && best.t.layer === 'small') why = '$a$, $b$ og $c$ er siderne i den store trekant $ABC$.'
     }
-    setMsg(guide || n >= 2 ? why : 'Den passer ikke her. Prøv igen.')
+    setMsg(n >= 2 ? why : 'Den passer ikke her. Prøv igen.')
   }
 
   function begin(e, d, at) {
@@ -462,7 +462,8 @@ export default function Construction({ step, guide, onComplete }) {
   }
   const thetaOk = theta >= TH_MIN && theta <= TH_MAX
   const showCoord = step === 3 && allPlaced(CHIPS.labels3)
-  const hl = step === 7 ? 'hyp' : step === 8 ? 'adj' : null
+  // Trin 7: hypotenuserne fremhæves (trin 8 afslører ikke, hvilke kateter der skal bruges)
+  const hl = step === 7 ? 'hyp' : null
 
   function handle({ at, d, label, arrow }) {
     const isActive = active === `${d.kind}:${d.id ?? ''}`
@@ -499,7 +500,7 @@ export default function Construction({ step, guide, onComplete }) {
       >
         <polygon className="tri" points={pts} />
         <line className={`side side-adj${hl === 'adj' ? ' is-hl' : ''}`} x1="0" y1="0" x2={w} y2="0" />
-        <line className="side side-opp" x1={w} y1="0" x2={w} y2={-h} />
+        <line className={`side side-opp${hl === 'opp' ? ' is-hl' : ''}`} x1={w} y1="0" x2={w} y2={-h} />
         <line className={`side side-hyp${hl === 'hyp' ? ' is-hl' : ''}`} x1="0" y1="0" x2={w} y2={-h} />
         <path className="right-angle" d={`M${w - ra} 0 V${-ra} H${w}`} />
         {step >= 5 && (
@@ -514,7 +515,7 @@ export default function Construction({ step, guide, onComplete }) {
           const t = targets.find((q) => q.id === tid)
           if (!t || t.layer !== id) return null
           const isVertex = t.id.startsWith('v-')
-          const lit = (hl === 'hyp' && t.id.endsWith('hyp')) || (hl === 'adj' && t.id.endsWith('adj'))
+          const lit = !!hl && t.id.endsWith(hl)
           return (
             <MathText
               key={cid}

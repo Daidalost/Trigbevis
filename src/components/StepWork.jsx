@@ -1,33 +1,21 @@
 import { useEffect, useState } from 'react'
 import { Tex, Rich } from './Tex.jsx'
 import ExprInput from './ExprInput.jsx'
+import { goal } from '../lib/steps.js'
 
-function Feedback({ result, guide, attempts }) {
+function Feedback({ result, attempts }) {
   const [showHint, setShowHint] = useState(false)
   useEffect(() => setShowHint(false), [result])
   if (!result) return null
-  if (result.status === 'ok') {
+  if (result.status === 'ok' || result.status === 'error' || result.status === 'form') {
+    const cls = { ok: 'fb-ok', error: 'fb-error', form: 'fb-form' }[result.status]
     return (
-      <p className="fb fb-ok">
+      <p className={`fb ${cls}`}>
         <Rich text={result.msg} />
       </p>
     )
   }
-  if (result.status === 'error') {
-    return (
-      <p className="fb fb-error">
-        <Rich text={result.msg} />
-      </p>
-    )
-  }
-  if (result.status === 'form') {
-    return (
-      <p className="fb fb-form">
-        <Rich text={result.msg} />
-      </p>
-    )
-  }
-  if (guide || showHint) {
+  if (showHint) {
     return (
       <p className="fb fb-wrong">
         <strong>Ikke korrekt. </strong>
@@ -47,12 +35,13 @@ function Feedback({ result, guide, attempts }) {
   )
 }
 
-/** Det aktive trin: overskrift, guide og svarfelt. Nøgles på trinnummer, så alt nulstilles ved nyt trin. */
-function CurrentStep({ s, guide, chain, onAnswer, onLine, onDraft }) {
+/** Det aktive trin: overskrift og svarfelt. Nøgles på trinnummer, så alt nulstilles ved nyt trin. */
+function CurrentStep({ s, answers, onAnswer, onLine, onDraft }) {
   const [result, setResult] = useState(null)
   const [attempts, setAttempts] = useState(0)
-  const lines = chain?.lines || []
-  const prev = lines.length ? lines[lines.length - 1].raw : s.start
+  const lines = answers[s.n]?.lines || []
+  // Trin 10 starter med elevens egen ligning fra trin 9
+  const prev = lines.length ? lines[lines.length - 1].raw : answers[s.n - 1]?.raw
 
   function submit(src) {
     const r = s.check(src, { prev })
@@ -75,11 +64,6 @@ function CurrentStep({ s, guide, chain, onAnswer, onLine, onDraft }) {
       <h2 className="work-title">
         <Rich text={s.title} />
       </h2>
-      {guide && s.guide && (
-        <p className="guide">
-          <Rich text={s.guide} />
-        </p>
-      )}
       {s.instr && (
         <p className="instr">
           <Rich text={s.instr} />
@@ -91,32 +75,33 @@ function CurrentStep({ s, guide, chain, onAnswer, onLine, onDraft }) {
             key={lines.length}
             inputId={`svar-${s.n}-${lines.length}`}
             prefix={s.lhs ? `${s.lhs} =` : undefined}
-            initial={s.kind === 'chain' ? prev : ''}
-            placeholder={s.kind === 'chain' ? '… = …' : 'fx c/1'}
+            initial={s.kind === 'chain' ? prev || '' : ''}
             onSubmit={submit}
             onDraft={onDraft}
           />
-          <Feedback result={result} guide={guide} attempts={attempts} />
+          <Feedback result={result} attempts={attempts} />
         </>
       )}
     </>
   )
 }
 
-export default function StepWork({ steps, step, guide, answers, onAnswer, onLine, onDraft, onRestart }) {
+export default function StepWork({ steps, step, variant, answers, onAnswer, onLine, onDraft, onRestart }) {
   const finished = step > steps.length
+  const g = goal(variant)
 
   if (finished) {
+    const other =
+      variant === 'cos'
+        ? 'Prøv også det andet bevis: Brug kateterne over for vinkel $A$, og vis på samme måde, at $\\sin(A) = \\tfrac{a}{c}$.'
+        : 'Prøv også det andet bevis: Brug kateterne ved vinkel $A$, og vis på samme måde, at $\\cos(A) = \\tfrac{b}{c}$.'
     return (
       <section className="work finale">
         <h2 className="work-title">Beviset er færdigt</h2>
-        <Tex display>{'\\cos(A) = \\dfrac{b}{c}'}</Tex>
-        <p>
-          I en retvinklet trekant er cosinus til en spids vinkel lig med den hosliggende katete divideret med
-          hypotenusen.
-        </p>
+        <Tex display>{g.tex}</Tex>
+        <p>I en retvinklet trekant er {g.words}.</p>
         <p className="finale-extra">
-          <Rich text="Prøv selv: Brug de lodrette kateter, $k = \tfrac{a}{\sin(A)}$, og vis på samme måde, at $\sin(A) = \tfrac{a}{c}$." />
+          <Rich text={other} />
         </p>
         <button type="button" className="primary" onClick={onRestart}>
           Start forfra
@@ -138,15 +123,7 @@ export default function StepWork({ steps, step, guide, answers, onAnswer, onLine
           ))}
         </ol>
       </div>
-      <CurrentStep
-        key={s.n}
-        s={s}
-        guide={guide}
-        chain={answers[s.n]}
-        onAnswer={onAnswer}
-        onLine={onLine}
-        onDraft={onDraft}
-      />
+      <CurrentStep key={s.n} s={s} answers={answers} onAnswer={onAnswer} onLine={onLine} onDraft={onDraft} />
     </section>
   )
 }

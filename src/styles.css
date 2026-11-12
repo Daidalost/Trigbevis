@@ -216,6 +216,12 @@ text.readout { dominant-baseline: central; text-anchor: start; pointer-events: n
 }
 .choice strong { font-size: 1.12rem; color: var(--blue-dark); }
 .choice span { color: var(--muted); }
+.choose { font-weight: 700; margin: 0 0 10px; }
+.choices-row { grid-template-columns: 1fr 1fr; }
+.choice-formula { justify-items: center; text-align: center; padding: 14px 16px 16px; }
+.choice-formula .tex-display { font-size: 1.45rem; color: var(--blue-dark); }
+.choice-formula .katex-display { margin: 2px 0 6px; }
+@media (max-width: 520px) { .choices-row { grid-template-columns: 1fr; } }
 .choice:hover { border-color: var(--blue); background: #fff; }
 .note { color: var(--muted); font-size: 0.92rem; margin: 14px 0 0; }
 
@@ -272,7 +278,7 @@ text.readout { dominant-baseline: central; text-anchor: start; pointer-events: n
   margin: 0 auto;
 }
 
-.left-col { display: grid; gap: 16px; min-width: 0; }
+.left-col { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; min-width: 0; }
 .right-col { position: sticky; top: 16px; min-width: 0; }
 .construction {
   background: var(--paper);
@@ -342,8 +348,9 @@ text.readout { dominant-baseline: central; text-anchor: start; pointer-events: n
 }
 .work-head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
 .work-count { color: var(--muted); font-size: 0.92rem; font-variant-numeric: tabular-nums; }
-.progress { display: flex; gap: 5px; list-style: none; margin: 0; padding: 0; }
-.progress li { width: 22px; height: 5px; border-radius: 3px; background: var(--grid); }
+.progress { display: flex; gap: 5px; list-style: none; margin: 0; padding: 0; flex: 0 1 auto; min-width: 0; }
+.progress li { width: 22px; min-width: 6px; flex: 0 1 22px; height: 5px; border-radius: 3px; background: var(--grid); }
+.work-count { white-space: nowrap; }
 .progress li.is-done { background: var(--green); }
 .progress li.is-active { background: var(--blue); }
 .work-title { font-size: 1.2rem; color: var(--blue-dark); margin: 0 0 10px; }

@@ -104,7 +104,7 @@ export default function ExprInput({ prefix, initial = '', placeholder, onSubmit,
         ) : preview?.error ? (
           <span className="preview-label">Udtrykket er ikke færdigt endnu …</span>
         ) : (
-          <span className="preview-label">Brøk skrives med /, fx b/c. Gangetegn kan skrives med * eller udelades.</span>
+          <span className="preview-label">Brøk skrives med /. Gangetegn kan skrives med * eller udelades.</span>
         )}
       </div>
 

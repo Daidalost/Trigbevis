@@ -2,8 +2,11 @@
 // så lighedstegnene kan stå under hinanden.
 import { parseInput, toLatex, isVar, strip } from './expr.js'
 
-/** Returnerer { lhs, rhs } som LaTeX – eller null, hvis svaret (endnu) ikke kan læses. */
-export function displayParts(step, src, { flipToCos = false } = {}) {
+/**
+ * Returnerer { lhs, rhs } som LaTeX – eller null, hvis svaret (endnu) ikke kan læses.
+ * flipTo: navnet på en variabel (fx 'cosA'), der skal stå til venstre i den sidste linje.
+ */
+export function displayParts(step, src, { flipTo = null } = {}) {
   if (!src || !src.trim()) return null
   try {
     const p = parseInput(src)
@@ -13,8 +16,7 @@ export function displayParts(step, src, { flipToCos = false } = {}) {
     }
     if (!p.rhs) return null
     let [L, R] = [p.lhs, p.rhs]
-    // Til sidst skal cos(A) stå til venstre
-    if (flipToCos && !isVar(strip(L), 'cosA') && isVar(strip(R), 'cosA')) [L, R] = [R, L]
+    if (flipTo && !isVar(strip(L), flipTo) && isVar(strip(R), flipTo)) [L, R] = [R, L]
     return { lhs: toLatex(L), rhs: toLatex(R) }
   } catch {
     return null

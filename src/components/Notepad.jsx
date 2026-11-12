@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { Tex, Rich } from './Tex.jsx'
 import { displayParts } from '../lib/display.js'
+import { goal } from '../lib/steps.js'
 
-// Blokken: figurtrinene (1–6) skrives som tekstlinjer. Trin 7–8 (k) og trin 9 (omformningen)
-// er ligninger med lighedstegnene under hinanden.
+// Blokken: figurtrinene (1–6) skrives som tekstlinjer. Trin 7–8 (k) er ét afsnit,
+// trin 9 (ligningen) og trin 10 (omformningen) et andet – lighedstegnene står under hinanden.
 
 function EqRow({ n, parts, state, result, note }) {
   return (
@@ -29,50 +30,45 @@ function EqRow({ n, parts, state, result, note }) {
   )
 }
 
-export default function Notepad({ steps, step, answers, draft }) {
+export default function Notepad({ steps, step, variant, answers, draft }) {
   const finished = step > steps.length
   const active = steps[step - 1]
+  const g = goal(variant)
   const sheetRef = useRef(null)
 
   // Rul med ned, når der kommer en ny linje på blokken
-  const lineCount = (answers[9]?.lines?.length || 0) + step
+  const lineCount = (answers[10]?.lines?.length || 0) + step
   useEffect(() => {
     const el = sheetRef.current
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
   }, [lineCount])
 
-  function exprRow(n) {
-    if (answers[n]) return <EqRow key={n} n={n} parts={answers[n]} state="done" />
+  /** Linje for trin 7, 8 eller 9: færdig, kladde (det aktive trin) eller ingenting */
+  function answerRow(n, note) {
+    if (answers[n]) return <EqRow key={n} n={n} parts={answers[n]} state="done" note={note} />
     if (n !== step) return null
-    const parts = displayParts(active, draft) || { lhs: active.lhs, rhs: '\\phantom{x}' }
+    let parts = displayParts(active, draft)
+    if (!parts && active.kind === 'expr') parts = { lhs: active.lhs, rhs: '\\phantom{x}' }
     return <EqRow key={n} n={n} parts={parts} state="draft" />
   }
 
-  // Trin 9: startligningen og elevens linjer
-  const s9 = steps[8]
-  const chain = answers[9]?.lines || []
-  const chainRows = []
-  if (step >= 9) {
-    chainRows.push(
-      <EqRow key="start" n={9} parts={displayParts(s9, s9.start)} state="done" note="(begge er k)" />,
-    )
-    chain.forEach((l, i) => {
-      const last = i === chain.length - 1 && answers[9]?.done
-      chainRows.push(<EqRow key={i} n="" parts={l} state="done" result={last} />)
-    })
-    if (step === 9) {
-      const parts = displayParts(s9, draft)
-      chainRows.push(<EqRow key="draft" n="" parts={parts} state="draft" />)
-    }
+  const chain = answers[10]?.lines || []
+  const lastRows = [answerRow(9, '(begge er k)')]
+  chain.forEach((l, i) => {
+    const last = i === chain.length - 1 && answers[10]?.done
+    lastRows.push(<EqRow key={`l${i}`} n={i === 0 ? 10 : ''} parts={l} state="done" result={last} />)
+  })
+  if (step === 10) {
+    lastRows.push(<EqRow key="draft" n={chain.length ? '' : 10} parts={displayParts(active, draft)} state="draft" />)
   }
 
   return (
     <div className="notepad">
       <div className="spiral" aria-hidden="true" />
       <div className="sheet" ref={sheetRef}>
-        <h2 className="sheet-title">Cosinus i en retvinklet trekant</h2>
+        <h2 className="sheet-title">{g.name} i en retvinklet trekant</h2>
         <p className="sheet-line">
-          <Rich text="Trekant $ABC$ er retvinklet i $C$. Vis, at $\cos(A) = \dfrac{b}{c}$." />
+          <Rich text={`Trekant $ABC$ er retvinklet i $C$. Vis, at $${g.tex}$.`} />
         </p>
         <p className="sheet-line sheet-proof">Bevis:</p>
 
@@ -94,13 +90,13 @@ export default function Notepad({ steps, step, answers, draft }) {
             ) : null,
           )}
 
-        {step >= 7 && <div className="eq-group">{[7, 8].map(exprRow).filter(Boolean)}</div>}
-        {chainRows.length > 0 && <div className="eq-group">{chainRows}</div>}
+        {step >= 7 && <div className="eq-group">{[answerRow(7), answerRow(8)].filter(Boolean)}</div>}
+        {step >= 9 && <div className="eq-group">{lastRows.filter(Boolean)}</div>}
 
         {finished && (
           <p className="sheet-line qed is-done">
             <span className="cell">
-              <Rich text="Altså er $\cos(A) = \dfrac{b}{c}$ – den hosliggende katete divideret med hypotenusen." />
+              <Rich text={`Altså er $${g.tex}$.`} />
             </span>
           </p>
         )}

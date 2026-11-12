@@ -26,7 +26,7 @@ function StartFigure() {
       <text className="lbl it" x={px - 0.12} y={py - 0.18}>P</text>
       <text className="lbl it" x={bx / 2} y={0.24}>b</text>
       <text className="lbl it" x={bx + 0.16} y={by / 2}>a</text>
-      <text className="lbl it" x={bx / 2 - 0.2} y={by / 2 - 0.2}>c</text>
+      <text className="lbl it" x={bx * 0.74 - 0.18} y={by * 0.74 - 0.14}>c</text>
     </svg>
   )
 }
@@ -37,22 +37,22 @@ export default function StartScreen({ onStart }) {
       <div className="start-inner">
         <StartFigure />
         <div className="start-text">
-          <h1>Cosinus i en retvinklet trekant</h1>
+          <h1>Sinus og cosinus i en retvinklet trekant</h1>
           <p className="lede">
             Tegn enhedscirklen, find en lille trekant med siderne <Tex>{'\\cos(A)'}</Tex> og <Tex>{'\\sin(A)'}</Tex>, og
-            brug forstørrelsesfaktoren til at bevise, at <Tex>{'\\cos(A) = \\dfrac{b}{c}'}</Tex>.
+            brug forstørrelsesfaktoren til at bevise sammenhængen i trekant <Tex>{'ABC'}</Tex>.
           </p>
-          <div className="choices">
-            <button type="button" className="choice" onClick={() => onStart('guide')}>
-              <strong>Med sproglig guide</strong>
-              <span>Hvert trin forklares med fagbegreber, og du får et hint, når et svar ikke er rigtigt.</span>
+          <p className="choose">Hvad vil du bevise?</p>
+          <div className="choices choices-row">
+            <button type="button" className="choice choice-formula" onClick={() => onStart('sin')}>
+              <Tex display>{'\\sin(A) = \\dfrac{a}{c}'}</Tex>
+              <span>Den modstående katete divideret med hypotenusen</span>
             </button>
-            <button type="button" className="choice" onClick={() => onStart('plain')}>
-              <strong>Uden guide</strong>
-              <span>Kun trinenes overskrifter. Du kan hente et hint, hvis du sidder fast.</span>
+            <button type="button" className="choice choice-formula" onClick={() => onStart('cos')}>
+              <Tex display>{'\\cos(A) = \\dfrac{b}{c}'}</Tex>
+              <span>Den hosliggende katete divideret med hypotenusen</span>
             </button>
           </div>
-          <p className="note">Guiden kan slås til og fra undervejs.</p>
         </div>
       </div>
     </main>

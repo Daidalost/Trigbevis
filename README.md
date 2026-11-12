@@ -1,6 +1,6 @@
-# cos(A) = b/c – interaktivt bevis
+# sin(A) = a/c og cos(A) = b/c – interaktive beviser
 
-Eleverne tegner selv enhedscirklen og den lille trekant med siderne $\cos(A)$, $\sin(A)$ og $1$, tegner en større ensvinklet trekant $ABC$, trækker de to trekanter ud ved siden af hinanden og bruger forstørrelsesfaktoren til at vise $\cos(A) = \tfrac{b}{c}$. Ni trin:
+I startmenuen vælges, om der skal bevises $\sin(A) = \tfrac{a}{c}$ eller $\cos(A) = \tfrac{b}{c}$. Begge beviser bruger enhedscirklen og to ensvinklede trekanter. Ti trin:
 
 1. Tegn enhedscirklen (træk passeren ud til radius 1)
 2. Træk punktet $P$ op ad cirklen og vælg vinkel $A$ (25°–65°)
@@ -8,13 +8,16 @@ Eleverne tegner selv enhedscirklen og den lille trekant med siderne $\cos(A)$, $
 4. Træk et punkt ud ad linjen gennem $P$, træk linjen ned til $x$-aksen, og navngiv trekanten $ABC$
 5. Træk de to trekanter ud og stil dem ved siden af hinanden
 6. Læg længderne $1$, $\cos(A)$, $\sin(A)$, $a$, $b$, $c$ på de rigtige sider
-7. Skriv forstørrelsesfaktoren som $k = \tfrac{c}{1}$
-8. Skriv forstørrelsesfaktoren som $k = \tfrac{b}{\cos(A)}$
-9. Omskriv $\tfrac{c}{1} = \tfrac{b}{\cos(A)}$ linje for linje, til der står $\cos(A) = \tfrac{b}{c}$
+7. Skriv forstørrelsesfaktoren op som de to hypotenuser divideret med hinanden
+8. Skriv nu forstørrelsesfaktoren op ud fra kateterne
+9. Sæt de to forstørrelsesfaktorer lig med hinanden
+10. Omskriv ligningen linje for linje, til der står $\sin(A) = \tfrac{a}{c}$ eller $\cos(A) = \tfrac{b}{c}$
 
-Ved start vælges **med sproglig guide** (forklaringer med fagbegreber og målrettede hint ved fejl) eller **uden guide** (kun overskrifter; hint kan hentes efter to forkerte forsøg). Guiden kan slås til og fra undervejs.
+Trin 7–9 har tomme felter uden forslag. I trin 10 står elevens egen ligning fra trin 9 i feltet, og eleven retter den til linje for linje. Hver linje tjekkes for, om den følger af den forrige.
 
-Til højre ligger en ternet blok, hvor beviset skrives ind linje for linje med trinnummer i margenen og lighedstegnene under hinanden. I trin 9 skriver eleven selv så mange mellemregninger, som de har brug for. Hver linje tjekkes for, om den følger af den forrige (er ensbetydende), og trinnet er færdigt, når $\cos(A) = \tfrac{b}{c}$ står.
+Der er ingen sproglig guide. Ved forkerte svar står der først kun »Ikke korrekt«, og efter to forsøg kan eleven hente et hint. Forkert placerede mærker på figuren forklares fra andet forsøg.
+
+Til højre ligger en ternet blok, hvor beviset skrives ind linje for linje med trinnummer i margenen og lighedstegnene under hinanden.
 
 ## Læg appen på Vercel
 
@@ -35,10 +38,10 @@ npm test         # tester svarkontrollen
 
 | Fil | Indhold |
 |---|---|
-| `src/lib/steps.js` | Trinenes overskrifter, guidetekster, betjeningsvejledning og teksterne på blokken |
+| `src/lib/steps.js` | Trinenes overskrifter, betjeningsvejledning og teksterne på blokken |
 | `src/components/Construction.jsx` | Figuren: passer, punkt, lodrette linjer, mærker og trekanter (trin 1–6). Øverst: forklaringerne ved forkert placerede mærker (`WHY`) |
 | `src/lib/geometry.js` | Tilladte vinkler (`TH_MIN`, `TH_MAX`) og størrelsen på den store trekant (`K_MIN`, `K_MAX`) |
-| `src/lib/checks.js` | Svarkontrol og hint for trin 7–9 |
+| `src/lib/checks.js` | Svarkontrol og hint for trin 7–10 (for både sin og cos) |
 | `src/components/Notepad.jsx` | Blokken med beviset |
 | `src/styles.css` | Farver og layout |
 
